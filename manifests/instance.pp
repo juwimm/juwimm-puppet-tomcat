@@ -18,6 +18,7 @@ define tomcat::instance(
   $version            = '6.0.29',
   $user               = $name,
   $home               = "/srv/system/tomcat",
+  $base               = "/srv/opt",
 ) {
 
   require tomcat
@@ -40,6 +41,7 @@ define tomcat::instance(
   user {$user :
     ensure           => present,
     home             => $home,
+    managehome       => false,
     comment          => "tomcat user ${user}",
     gid              => $user,
     shell            => "/bin/sh",
@@ -49,8 +51,8 @@ define tomcat::instance(
   }
 
 
-  $h = get_cwd_hash_path($home, $user)
-  create_resources('file', $h)
+#  $h = get_cwd_hash_path($home, $user)
+#  create_resources('file', $h)
 
   file {$home :
     ensure  => directory,
@@ -60,7 +62,7 @@ define tomcat::instance(
     require => User[$user],
   }
 
-  exec {"cp -r /var/tmp/tomcat-${version} ${home}/tomcat" :
+  exec {"cp -r /var/tmp/apache-tomcat-${version} ${base}" :
     cwd       => '/',
     user      => 'root',
     path      => '/bin',
@@ -69,49 +71,15 @@ define tomcat::instance(
     require   => [File[$home], Exec["curl -L http://archive.apache.org/dist/tomcat/tomcat-${major_ver}/v${version}/bin/apache-tomcat-${version}.tar.gz  | tar -xzf - && cd apache-tomcat-${version}"]]
   }
 #
-#  file {"${home}/tomcat":
+#  file {"${home}/apache-tomcat":
 #    ensure  => directory,
 #    owner   => $user,
 #    group   => $user,
 #    mode    => '0700',
 #    recurse => true,
-#    require => Exec["cp -r /var/tmp/tomcat-${version} ${home}/tomcat"],
+#    require => Exec["cp -r /var/tmp/apache-tomcat-${version} ${home}/apache-tomcat"],
 #  }
 #
-#  file {"${home}/${admin_username}.pub" :
-#    ensure  => present,
-#    owner   => $user,
-#    group   => $user,
-#    mode    => '0700',
-#    content => $admin_pub_key,
-#    require => File["${home}/tomcat"],
-#  }
-#
-#  file {"${home}/.tomcat.rc" :
-#    ensure  =>  present,
-#    content =>  template("tomcat/tomcat-${major_ver}.rc"),
-#    owner   =>  $user,
-#    group   =>  $user,
-#    mode    =>  '0770',
-#    require =>  File["${home}/${admin_username}.pub"],
-#  }
-#
-# exec {"${home}/tomcat/src/tomcat setup -pk ${admin_username}.pub" :
-#    user        => $user,
-#    cwd         => $home,
-#    environment => ["HOME=${home}"],
-#    path        => ['/usr/bin', '/bin'],
-#    logoutput   => on_failure,
-#    require     => File["${home}/.tomcat.rc"],
-#  }
-#
-#  file {"${home}/.ssh" :
-#    ensure  =>  present,
-#    owner   =>  $user,
-#    group   =>  $user,
-#    mode    =>  '0600',
-#    recurse =>  true,
-#    require =>  Exec["${home}/tomcat/src/tomcat setup -pk ${admin_username}.pub"],
-#  }
+
 
 }
