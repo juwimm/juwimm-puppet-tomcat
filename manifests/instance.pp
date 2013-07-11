@@ -11,7 +11,7 @@
 # Examples:
 #
 #   tomcat::instance {'me' :
-#     version => '6.0.28',
+#     version => '6.0.29',
 #   }
 #
 define tomcat::instance(
@@ -24,13 +24,13 @@ define tomcat::instance(
 
   $major_ver = get_first_part($version, '.')
 
-  exec {"curl -L http://archive.apache.org/dist/tomcat/tomcat-${major_ver}/v${version}/bin/apache-tomcat-${version}.tar.gz  | tar -xzf - && cd tomcat-${version}" :
+  exec {"curl -L http://archive.apache.org/dist/tomcat/tomcat-${major_ver}/v${version}/bin/apache-tomcat-${version}.tar.gz  | tar -xzf - && cd apache-tomcat-${version}" :
     cwd       =>  '/var/tmp',
     user      =>  'root',
     path      =>  ['/usr/local/bin', '/bin', '/usr/bin'],
     timeout   =>  0,
     logoutput =>  on_failure,
-    unless    =>  "ls /var/tmp/tomcat-${version}",
+    unless    =>  "ls /var/tmp/apache-tomcat-${version}",
   }
 
   group {$user :
