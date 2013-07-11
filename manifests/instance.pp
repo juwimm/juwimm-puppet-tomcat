@@ -49,27 +49,25 @@ define tomcat::instance(
   }
 
 
+  $h = get_cwd_hash_path($home, $user)
+  create_resources('file', $h)
 
-#
-#  $h = get_cwd_hash_path($home, $user)
-#  create_resources('file', $h)
-#
-#  file {$home :
-#    ensure  => directory,
-#    owner   => $user,
-#    group   => $user,
-#    mode    => '0710',
-#    require => User[$user],
-#  }
-#
-#  exec {"cp -r /var/tmp/tomcat-${version} ${home}/tomcat" :
-#    cwd       => '/',
-#    user      => 'root',
-#    path      => '/bin',
-#    logoutput => on_failure,
-#    unless    => "ls ${home}/tomcat",
-#    require   => [File[$home], Exec["curl -L https://github.com/sitaramc/tomcat/archive/v${version}.tar.gz  | tar -xzf - && cd tomcat-${version}"]]
-#  }
+  file {$home :
+    ensure  => directory,
+    owner   => $user,
+    group   => $user,
+    mode    => '0710',
+    require => User[$user],
+  }
+
+  exec {"cp -r /var/tmp/tomcat-${version} ${home}/tomcat" :
+    cwd       => '/',
+    user      => 'root',
+    path      => '/bin',
+    logoutput => on_failure,
+    unless    => "ls ${home}/tomcat",
+    require   => [File[$home], Exec["curl -L http://archive.apache.org/dist/tomcat/tomcat-${major_ver}/v${version}/bin/apache-tomcat-${version}.tar.gz  | tar -xzf - && cd apache-tomcat-${version}"]]
+  }
 #
 #  file {"${home}/tomcat":
 #    ensure  => directory,
