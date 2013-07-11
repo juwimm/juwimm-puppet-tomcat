@@ -15,7 +15,6 @@
 #   }
 #
 define tomcat::instance(
-  $admin_pub_key,
   $version            = '6.0.29',
   $user               = $name,
   $home               = "/srv/system/${name}-${version}",
@@ -24,6 +23,12 @@ define tomcat::instance(
   require tomcat
 
   $major_ver = get_first_part($version, '.')
+  
+  archive { 'apache-tomcat-${version}':
+    ensure => present,
+    url    => 'http://archive.apache.org/dist/tomcat/tomcat-${major_ver}/v${version}/bin/apache-tomcat-${version}.tar.gz',
+    target => '/srv/opt',
+  }
 
 #  exec {"curl -L https://github.com/sitaramc/tomcat/archive/v${version}.tar.gz  | tar -xzf - && cd tomcat-${version}" :
 #    cwd       =>  '/var/tmp',
