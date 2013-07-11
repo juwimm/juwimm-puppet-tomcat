@@ -6,8 +6,7 @@
 #
 # Actions:
 #
-#   Declares all other classes in the tomcat module. Currently, this consists
-#   of tomcat::instance.
+#   Declares all other classes in the tomcat module.
 #
 # Requires: nothing
 #
@@ -15,6 +14,5 @@
 #
 class tomcat {
 
-  class { 'tomcat::instance': }
 
 }
