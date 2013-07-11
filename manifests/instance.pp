@@ -17,42 +17,39 @@
 define tomcat::instance(
   $version            = '6.0.29',
   $user               = $name,
-  $home               = "/srv/system/${name}-${version}",
+  $home               = "/srv/system/tomcat",
 ) {
 
   require tomcat
 
   $major_ver = get_first_part($version, '.')
-  
-  archive { 'apache-tomcat-${version}':
-    ensure => present,
-    url    => 'http://archive.apache.org/dist/tomcat/tomcat-${major_ver}/v${version}/bin/apache-tomcat-${version}.tar.gz',
-    target => '/srv/opt',
+
+  exec {"curl -L http://archive.apache.org/dist/tomcat/tomcat-${major_ver}/v${version}/bin/apache-tomcat-${version}.tar.gz  | tar -xzf - && cd tomcat-${version}" :
+    cwd       =>  '/var/tmp',
+    user      =>  'root',
+    path      =>  ['/usr/local/bin', '/bin', '/usr/bin'],
+    timeout   =>  0,
+    logoutput =>  on_failure,
+    unless    =>  "ls /var/tmp/tomcat-${version}",
   }
 
-#  exec {"curl -L https://github.com/sitaramc/tomcat/archive/v${version}.tar.gz  | tar -xzf - && cd tomcat-${version}" :
-#    cwd       =>  '/var/tmp',
-#    user      =>  'root',
-#    path      =>  ['/usr/local/bin', '/bin', '/usr/bin'],
-#    timeout   =>  0,
-#    logoutput =>  on_failure,
-#    unless    =>  "ls /var/tmp/tomcat-${version}",
-#  }
-#
-#  group {$user :
-#    ensure => present,
-#  }
-#
-#  user {$user :
-#    ensure           => present,
-#    home             => $home,
-#    comment          => "tomcat user ${user}",
-#    gid              => $user,
-#    shell            => "/bin/sh",
-#    password_min_age => '0',
-#    password_max_age => '99999',
-#    password         => '*',
-#  }
+  group {$user :
+    ensure => present,
+  }
+
+  user {$user :
+    ensure           => present,
+    home             => $home,
+    comment          => "tomcat user ${user}",
+    gid              => $user,
+    shell            => "/bin/sh",
+    password_min_age => '0',
+    password_max_age => '99999',
+    password         => '*',
+  }
+
+
+
 #
 #  $h = get_cwd_hash_path($home, $user)
 #  create_resources('file', $h)
