@@ -51,16 +51,16 @@ define tomcat::instance(
   }
 
 
-#  $h = get_cwd_hash_path($home, $user)
-#  create_resources('file', $h)
+  $h = get_cwd_hash_path($home, $user)
+  create_resources('file', $h)
 
-  file {$home :
-    ensure  => directory,
-    owner   => $user,
-    group   => $user,
-    mode    => '0710',
-    require => User[$user],
-  }
+#  file {$home :
+#    ensure  => directory,
+#    owner   => $user,
+#    group   => $user,
+#    mode    => '0710',
+#    require => User[$user],
+#  }
 
   exec {"cp -r /var/tmp/apache-tomcat-${version} ${base}" :
     cwd       => '/',
